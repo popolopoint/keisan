@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>レンタル計算 v1.1.7 by Popolo App.com</title>
+    <title>レンタル料金計算 v1.1.8 by Popolo App.com</title>
     <style>
         :root {
             --ios-bg: #f2f2f7;
@@ -22,11 +22,12 @@
         }
         .container { max-width: 500px; margin: 0 auto; }
         
+        /* 合計表示カード（アプリ名・Ver込み） */
         .total-display-card {
             background: var(--ios-blue);
             color: white;
             border-radius: 15px;
-            padding: 25px;
+            padding: 20px;
             text-align: center;
             margin-bottom: 20px;
             box-shadow: 0 8px 20px rgba(0,122,255,0.3);
@@ -34,10 +35,10 @@
             top: 10px;
             z-index: 100;
         }
-        .total-label { font-size: 20px; opacity: 0.9; }
-        .total-amount { font-size: 48px; font-weight: bold; margin: 10px 0; }
-
-        h1 { font-size: 18px; text-align: center; margin: 10px 0 20px; color: var(--ios-gray); }
+        .app-name-label { font-size: 16px; font-weight: bold; opacity: 0.9; margin-bottom: 5px; display: block; }
+        .total-label { font-size: 18px; opacity: 0.8; }
+        .total-amount { font-size: 48px; font-weight: bold; margin: 5px 0; }
+        .ver-label { font-size: 12px; text-align: right; display: block; opacity: 0.7; margin-top: 5px; }
 
         .section-header { font-size: 18px; color: var(--ios-gray); margin: 0 0 8px 15px; font-weight: bold; }
         .section { background: var(--ios-card); border-radius: 12px; margin-bottom: 25px; overflow: hidden; border: 1px solid var(--ios-border); }
@@ -71,12 +72,11 @@
 
 <div class="container">
     <div class="total-display-card">
+        <span class="app-name-label">レンタル料金計算 by Popolo App.com</span>
         <div class="total-label">合計金額 (税込)</div>
         <div class="total-amount">¥<span id="totalDisplay">0</span></div>
-        <div style="font-size: 14px; opacity: 0.8;">by Popolo App.com</div>
+        <span class="ver-label">Version 1.1.8</span>
     </div>
-
-    <h1>レンタル計算 v1.1.7</h1>
 
     <div class="section-header">基本設定</div>
     <div class="section">
