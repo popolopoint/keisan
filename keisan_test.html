@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>レンタル計算 v1.1.2 by Popolo App.com</title>
+    <style>
+        :root {
+            --ios-bg: #f2f2f7;
+            --ios-card: #ffffff;
+            --ios-blue: #007aff;
+            --ios-gray: #8e8e93;
+            --ios-border: #c6c6c8;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Kaku Gothic ProN", sans-serif;
+            background-color: var(--ios-bg);
+            margin: 0;
+            padding: 20px;
+            color: #000;
+        }
+        .container { max-width: 400px; margin: 0 auto; }
+        h1 { font-size: 17px; text-align: center; margin-bottom: 20px; }
+        .section-header { font-size: 13px; color: var(--ios-gray); margin: 0 0 6px 15px; text-transform: uppercase; }
+        .section { background: var(--ios-card); border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
+        .row { display: flex; align-items: center; padding: 12px 15px; border-bottom: 0.5px solid var(--ios-border); }
+        .row:last-child { border-bottom: none; }
+        .label { flex: 1; font-size: 16px; }
+        select, input { font-size: 16px; border: none; background: none; text-align: right; color: var(--ios-blue); outline: none; }
+        .stepper { display: flex; align-items: center; gap: 15px; }
+        .btn { width: 30px; height: 30px; border-radius: 15px; background: #e9e9eb; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--ios-blue); cursor: pointer; user-select: none; }
+        .total-box { background: var(--ios-card); border-radius: 10px; padding: 20px; text-align: center; }
+        .total-amount { font-size: 32px; font-weight: bold; color: var(--ios-blue); margin: 5px 0; }
+        .footer { text-align: center; font-size: 12px; color: var(--ios-gray); margin-top: 30px; }
+        .sub-label { font-size: 12px; color: var(--ios-gray); margin-left: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>レンタル計算 v1.1.2</h1>
+
+    <div class="section-header">基本料金</div>
+    <div class="section">
+        <div class="row">
+            <span class="label">プラン</span>
+            <select id="basePrice" onchange="calculate()">
+                <option value="5500">ウインド ￥5,500</option>
+                <option value="7700">ウイングフォイル ￥7,700</option>
+                <option value="8800">ウインドフォイル ￥8,800</option>
+            </select>
+        </div>
+        <div class="row">
+            <span class="label">人数</span>
+            <div class="stepper">
+                <div class="btn" onclick="step('personCount', -1)">−</div>
+                <span id="personCountText">1</span>
+                <div class="btn" onclick="step('personCount', 1)">＋</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-header">時間延長 <span class="sub-label">(￥1,100 × 時間 × 人数)</span></div>
+    <div class="section">
+        <div class="row">
+            <span class="label">時間 (h)</span>
+            <div class="stepper">
+                <div class="btn" onclick="step('exTime', -1)">−</div>
+                <span id="exTimeText">0</span>
+                <div class="btn" onclick="step('exTime', 1)">＋</div>
+            </div>
+        </div>
+        <div class="row" style="background-color: #f9f9f9;">
+            <span class="label">数量 <span class="sub-label">(人数と連動)</span></span>
+            <span id="exQtyText" style="color: #8e8e93; padding-right: 15px;">1</span>
+        </div>
+    </div>
+
+    <div class="section-header">オプション</div>
+    <div class="section">
+        <div class="row"><span class="label">機材保険 (￥550)</span>
+            <div class="stepper"><div class="btn" onclick="step('ins', -1)">−</div><span id="insText">1</span><div class="btn" onclick="step('ins', 1)">＋</div></div>
+        </div>
+        <div class="row"><span class="label">ウェットスーツ (￥1100)</span>
+            <div class="stepper"><div class="btn" onclick="step('wet', -1)">−</div><span id="wetText">0</span><div class="btn" onclick="step('wet', 1)">＋</div></div>
+        </div>
+        <div class="row"><span class="label">ブーツ (￥330)</span>
+            <div class="stepper"><div class="btn" onclick="step('boots', -1)">−</div><span id="bootsText">0</span><div class="btn" onclick="step('boots', 1)">＋</div></div>
+        </div>
+        <div class="row"><span class="label">レッスンA (￥1100)</span>
+            <div class="stepper"><div class="btn" onclick="step('lesA', -1)">−</div><span id="lesAText">0</span><div class="btn" onclick="step('lesA', 1)">＋</div></div>
+        </div>
+        <div class="row"><span class="label">レッスンB (￥3300)</span>
+            <div class="stepper"><div class="btn" onclick="step('lesB', -1)">−</div><span id="lesBText">0</span><div class="btn" onclick="step('lesB', 1)">＋</div></div>
+        </div>
+        <div class="row"><span class="label">グレードアップ (￥1100)</span>
+            <div class="stepper"><div class="btn" onclick="step('upg', -1)">−</div><span id="upgText">0</span><div class="btn" onclick="step('upg', 1)">＋</div></div>
+        </div>
+        <div class="row">
+            <span class="label">その他 (￥)</span>
+            <input type="number" id="otherPrice" value="0" style="width: 80px;" oninput="calculate()">
+        </div>
+        <div class="row">
+            <span class="label">その他 数量</span>
+            <div class="stepper">
+                <div class="btn" onclick="step('otherQty', -1)">−</div>
+                <span id="otherQtyText">0</span>
+                <div class="btn" onclick="step('otherQty', 1)">＋</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="total-box">
+        <div class="total-label" style="font-size: 14px; color: var(--ios-gray);">合計金額 (税込)</div>
+        <div class="total-amount">¥<span id="totalDisplay">0</span></div>
+    </div>
+
+    <div class="footer">by Popolo App.com</div>
+</div>
+
+<script>
+    let data = {
+        personCount: 1,
+        exTime: 0,
+        ins: 1,
+        wet: 0,
+        boots: 0,
+        lesA: 0,
+        lesB: 0,
+        upg: 0,
+        otherQty: 0
+    };
+
+    function step(key, val) {
+        data[key] = Math.max(0, data[key] + val);
+        document.getElementById(key + 'Text').innerText = data[key];
+        
+        // 人数が変わったら延長の数量表示も更新
+        if (key === 'personCount') {
+            document.getElementById('exQtyText').innerText = data.personCount;
+        }
+        calculate();
+    }
+
+    function calculate() {
+        const base = parseInt(document.getElementById('basePrice').value);
+        const otherP = parseInt(document.getElementById('otherPrice').value) || 0;
+
+        // 時間延長 ＝ 1100円 × 時間 × 人数
+        const extraTimeTotal = 1100 * data.exTime * data.personCount;
+
+        const total = (base * data.personCount) +
+                      extraTimeTotal +
+                      (550 * data.ins) +
+                      (1100 * data.wet) +
+                      (330 * data.boots) +
+                      (1100 * data.lesA) +
+                      (3300 * data.lesB) +
+                      (1100 * data.upg) +
+                      (otherP * data.otherQty);
+
+        document.getElementById('totalDisplay').innerText = total.toLocaleString();
+    }
+
+    calculate();
+</script>
+
+</body>
+</html>
