@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>レンタル計算 v1.1.2 by Popolo App.com</title>
+    <title>レンタル計算 v1.1.3 by Popolo App.com</title>
     <style>
         :root {
             --ios-bg: #f2f2f7;
@@ -16,103 +16,124 @@
             font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Kaku Gothic ProN", sans-serif;
             background-color: var(--ios-bg);
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             color: #000;
         }
-        .container { max-width: 400px; margin: 0 auto; }
-        h1 { font-size: 17px; text-align: center; margin-bottom: 20px; }
+        .container { max-width: 450px; margin: 0 auto; }
+        
+        /* 合計金額を最上部に固定 */
+        .total-display-card {
+            background: var(--ios-blue);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,122,255,0.3);
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+        }
+        .total-label { font-size: 14px; opacity: 0.9; }
+        .total-amount { font-size: 36px; font-weight: bold; margin: 5px 0; }
+
         .section-header { font-size: 13px; color: var(--ios-gray); margin: 0 0 6px 15px; text-transform: uppercase; }
-        .section { background: var(--ios-card); border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
+        .section { background: var(--ios-card); border-radius: 10px; margin-bottom: 20px; overflow: hidden; border: 0.5px solid var(--ios-border); }
         .row { display: flex; align-items: center; padding: 12px 15px; border-bottom: 0.5px solid var(--ios-border); }
         .row:last-child { border-bottom: none; }
-        .label { flex: 1; font-size: 16px; }
-        select, input { font-size: 16px; border: none; background: none; text-align: right; color: var(--ios-blue); outline: none; }
-        .stepper { display: flex; align-items: center; gap: 15px; }
-        .btn { width: 30px; height: 30px; border-radius: 15px; background: #e9e9eb; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--ios-blue); cursor: pointer; user-select: none; }
-        .total-box { background: var(--ios-card); border-radius: 10px; padding: 20px; text-align: center; }
-        .total-amount { font-size: 32px; font-weight: bold; color: var(--ios-blue); margin: 5px 0; }
-        .footer { text-align: center; font-size: 12px; color: var(--ios-gray); margin-top: 30px; }
-        .sub-label { font-size: 12px; color: var(--ios-gray); margin-left: 5px; }
+        .label { flex: 1; font-size: 16px; font-weight: 500; }
+        
+        select, input { font-size: 16px; border: none; background: none; text-align: right; color: var(--ios-blue); outline: none; width: 100%; }
+        
+        .stepper { display: flex; align-items: center; gap: 15px; background: #efeff4; border-radius: 8px; padding: 4px 8px; }
+        .btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; color: var(--ios-blue); cursor: pointer; user-select: none; }
+        .count-value { min-width: 20px; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }
+        
+        .footer { text-align: center; font-size: 12px; color: var(--ios-gray); margin: 20px 0 40px 0; }
+        .price-tag { font-size: 12px; color: var(--ios-gray); margin-top: 2px; display: block; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>レンタル計算 v1.1.2</h1>
+    <div class="total-display-card">
+        <div class="total-label">合計金額 (税込)</div>
+        <div class="total-amount">¥<span id="totalDisplay">0</span></div>
+        <div style="font-size: 11px; opacity: 0.8;">レンタル計算 v1.1.3</div>
+    </div>
 
     <div class="section-header">基本料金</div>
     <div class="section">
         <div class="row">
-            <span class="label">プラン</span>
+            <div class="label">プラン</div>
             <select id="basePrice" onchange="calculate()">
-                <option value="5500">ウインド ￥5,500</option>
-                <option value="7700">ウイングフォイル ￥7,700</option>
-                <option value="8800">ウインドフォイル ￥8,800</option>
+                <option value="5500">ウインド (￥5,500)</option>
+                <option value="7700">ウイングフォイル (￥7,700)</option>
+                <option value="8800">ウインドフォイル (￥8,800)</option>
             </select>
         </div>
         <div class="row">
-            <span class="label">人数</span>
+            <div class="label">人数</div>
             <div class="stepper">
                 <div class="btn" onclick="step('personCount', -1)">−</div>
-                <span id="personCountText">1</span>
+                <span class="count-value" id="personCountText">1</span>
                 <div class="btn" onclick="step('personCount', 1)">＋</div>
             </div>
         </div>
     </div>
 
-    <div class="section-header">時間延長 <span class="sub-label">(￥1,100 × 時間 × 人数)</span></div>
+    <div class="section-header">時間延長 (￥1,100)</div>
     <div class="section">
         <div class="row">
-            <span class="label">時間 (h)</span>
+            <div class="label">延長時間<span class="price-tag">時間(h)を入力</span></div>
             <div class="stepper">
                 <div class="btn" onclick="step('exTime', -1)">−</div>
-                <span id="exTimeText">0</span>
+                <span class="count-value" id="exTimeText">0</span>
                 <div class="btn" onclick="step('exTime', 1)">＋</div>
             </div>
         </div>
-        <div class="row" style="background-color: #f9f9f9;">
-            <span class="label">数量 <span class="sub-label">(人数と連動)</span></span>
-            <span id="exQtyText" style="color: #8e8e93; padding-right: 15px;">1</span>
+        <div class="row">
+            <div class="label">延長人数<span class="price-tag">延長する人数を入力</span></div>
+            <div class="stepper">
+                <div class="btn" onclick="step('exQty', -1)">−</div>
+                <span class="count-value" id="exQtyText">0</span>
+                <div class="btn" onclick="step('exQty', 1)">＋</div>
+            </div>
         </div>
     </div>
 
     <div class="section-header">オプション</div>
     <div class="section">
-        <div class="row"><span class="label">機材保険 (￥550)</span>
-            <div class="stepper"><div class="btn" onclick="step('ins', -1)">−</div><span id="insText">1</span><div class="btn" onclick="step('ins', 1)">＋</div></div>
+        <div class="row"><div class="label">機材保険<span class="price-tag">￥550</span></div>
+            <div class="stepper"><div class="btn" onclick="step('ins', -1)">−</div><span class="count-value" id="insText">1</span><div class="btn" onclick="step('ins', 1)">＋</div></div>
         </div>
-        <div class="row"><span class="label">ウェットスーツ (￥1100)</span>
-            <div class="stepper"><div class="btn" onclick="step('wet', -1)">−</div><span id="wetText">0</span><div class="btn" onclick="step('wet', 1)">＋</div></div>
+        <div class="row"><div class="label">ウェットスーツ<span class="price-tag">￥1,100</span></div>
+            <div class="stepper"><div class="btn" onclick="step('wet', -1)">−</div><span class="count-value" id="wetText">0</span><div class="btn" onclick="step('wet', 1)">＋</div></div>
         </div>
-        <div class="row"><span class="label">ブーツ (￥330)</span>
-            <div class="stepper"><div class="btn" onclick="step('boots', -1)">−</div><span id="bootsText">0</span><div class="btn" onclick="step('boots', 1)">＋</div></div>
+        <div class="row"><div class="label">ブーツ<span class="price-tag">￥330</span></div>
+            <div class="stepper"><div class="btn" onclick="step('boots', -1)">−</div><span class="count-value" id="bootsText">0</span><div class="btn" onclick="step('boots', 1)">＋</div></div>
         </div>
-        <div class="row"><span class="label">レッスンA (￥1100)</span>
-            <div class="stepper"><div class="btn" onclick="step('lesA', -1)">−</div><span id="lesAText">0</span><div class="btn" onclick="step('lesA', 1)">＋</div></div>
+        <div class="row"><div class="label">レッスンA<span class="price-tag">￥1,100</span></div>
+            <div class="stepper"><div class="btn" onclick="step('lesA', -1)">−</div><span class="count-value" id="lesAText">0</span><div class="btn" onclick="step('lesA', 1)">＋</div></div>
         </div>
-        <div class="row"><span class="label">レッスンB (￥3300)</span>
-            <div class="stepper"><div class="btn" onclick="step('lesB', -1)">−</div><span id="lesBText">0</span><div class="btn" onclick="step('lesB', 1)">＋</div></div>
+        <div class="row"><div class="label">レッスンB<span class="price-tag">￥3,300</span></div>
+            <div class="stepper"><div class="btn" onclick="step('lesB', -1)">−</div><span class="count-value" id="lesBText">0</span><div class="btn" onclick="step('lesB', 1)">＋</div></div>
         </div>
-        <div class="row"><span class="label">グレードアップ (￥1100)</span>
-            <div class="stepper"><div class="btn" onclick="step('upg', -1)">−</div><span id="upgText">0</span><div class="btn" onclick="step('upg', 1)">＋</div></div>
-        </div>
-        <div class="row">
-            <span class="label">その他 (￥)</span>
-            <input type="number" id="otherPrice" value="0" style="width: 80px;" oninput="calculate()">
+        <div class="row"><div class="label">グレードアップ<span class="price-tag">￥1,100</span></div>
+            <div class="stepper"><div class="btn" onclick="step('upg', -1)">−</div><span class="count-value" id="upgText">0</span><div class="btn" onclick="step('upg', 1)">＋</div></div>
         </div>
         <div class="row">
-            <span class="label">その他 数量</span>
+            <div class="label">その他単価 (￥)</div>
+            <input type="number" id="otherPrice" placeholder="0" oninput="calculate()">
+        </div>
+        <div class="row">
+            <div class="label">その他数量</div>
             <div class="stepper">
                 <div class="btn" onclick="step('otherQty', -1)">−</div>
-                <span id="otherQtyText">0</span>
+                <span class="count-value" id="otherQtyText">0</span>
                 <div class="btn" onclick="step('otherQty', 1)">＋</div>
             </div>
         </div>
-    </div>
-
-    <div class="total-box">
-        <div class="total-label" style="font-size: 14px; color: var(--ios-gray);">合計金額 (税込)</div>
-        <div class="total-amount">¥<span id="totalDisplay">0</span></div>
     </div>
 
     <div class="footer">by Popolo App.com</div>
@@ -122,6 +143,7 @@
     let data = {
         personCount: 1,
         exTime: 0,
+        exQty: 0,
         ins: 1,
         wet: 0,
         boots: 0,
@@ -134,11 +156,6 @@
     function step(key, val) {
         data[key] = Math.max(0, data[key] + val);
         document.getElementById(key + 'Text').innerText = data[key];
-        
-        // 人数が変わったら延長の数量表示も更新
-        if (key === 'personCount') {
-            document.getElementById('exQtyText').innerText = data.personCount;
-        }
         calculate();
     }
 
@@ -146,11 +163,9 @@
         const base = parseInt(document.getElementById('basePrice').value);
         const otherP = parseInt(document.getElementById('otherPrice').value) || 0;
 
-        // 時間延長 ＝ 1100円 × 時間 × 人数
-        const extraTimeTotal = 1100 * data.exTime * data.personCount;
-
+        // 合計計算
         const total = (base * data.personCount) +
-                      extraTimeTotal +
+                      (1100 * data.exTime * data.exQty) +
                       (550 * data.ins) +
                       (1100 * data.wet) +
                       (330 * data.boots) +
@@ -162,6 +177,7 @@
         document.getElementById('totalDisplay').innerText = total.toLocaleString();
     }
 
+    // 初期化
     calculate();
 </script>
 
