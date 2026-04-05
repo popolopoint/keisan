@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>レンタル計算 v1.1.6 by Popolo App.com</title>
+    <title>レンタル計算 v1.1.7 by Popolo App.com</title>
     <style>
         :root {
             --ios-bg: #f2f2f7;
@@ -22,7 +22,6 @@
         }
         .container { max-width: 500px; margin: 0 auto; }
         
-        /* 合計表示（最上部固定） */
         .total-display-card {
             background: var(--ios-blue);
             color: white;
@@ -38,7 +37,7 @@
         .total-label { font-size: 20px; opacity: 0.9; }
         .total-amount { font-size: 48px; font-weight: bold; margin: 10px 0; }
 
-        h1 { font-size: 20px; text-align: center; margin: 10px 0 20px; color: var(--ios-gray); }
+        h1 { font-size: 18px; text-align: center; margin: 10px 0 20px; color: var(--ios-gray); }
 
         .section-header { font-size: 18px; color: var(--ios-gray); margin: 0 0 8px 15px; font-weight: bold; }
         .section { background: var(--ios-card); border-radius: 12px; margin-bottom: 25px; overflow: hidden; border: 1px solid var(--ios-border); }
@@ -48,7 +47,6 @@
         
         .label { font-size: var(--font-main); font-weight: 600; flex-shrink: 0; margin-right: 10px; }
         
-        /* プランとその他単価を横並びにするスタイル */
         select, input[type="number"] { 
             font-size: var(--font-main); 
             border: 2px solid #e5e5ea; 
@@ -58,10 +56,9 @@
             color: var(--ios-blue); 
             outline: none; 
             padding: 8px;
-            width: 160px; /* 横幅を調整 */
+            min-width: 180px;
         }
         
-        /* ステッパー */
         .stepper { display: flex; align-items: center; gap: 20px; background: #efeff4; border-radius: 10px; padding: 6px 12px; }
         .btn { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; color: var(--ios-blue); cursor: pointer; user-select: none; }
         .count-value { min-width: 35px; text-align: center; font-size: 26px; font-weight: bold; font-variant-numeric: tabular-nums; }
@@ -79,16 +76,17 @@
         <div style="font-size: 14px; opacity: 0.8;">by Popolo App.com</div>
     </div>
 
-    <h1>レンタル計算 v1.1.6</h1>
+    <h1>レンタル計算 v1.1.7</h1>
 
     <div class="section-header">基本設定</div>
     <div class="section">
         <div class="row">
             <div class="label">プラン</div>
             <select id="basePrice" onchange="calculate()">
-                <option value="5500">ウインド</option>
-                <option value="7700">ウイングF</option>
-                <option value="8800">ウインドF</option>
+                <option value="5500">ウインドサーフィン ¥5,500</option>
+                <option value="7700">ウイングフォイル ¥7,700</option>
+                <option value="8800">ウインドフォイル ¥8,800</option>
+                <option value="4400">SUP ¥4,400</option>
             </select>
         </div>
         <div class="row">
@@ -101,10 +99,17 @@
         </div>
     </div>
 
-    <div class="section-header">時間延長 (¥1,100)</div>
+    <div class="section-header">時間延長設定</div>
     <div class="section">
         <div class="row">
-            <div class="label">時間(h)</div>
+            <div class="label">延長単価</div>
+            <select id="exUnitPrice" onchange="calculate()">
+                <option value="1100" selected>¥1,100</option>
+                <option value="550">¥550</option>
+            </select>
+        </div>
+        <div class="row">
+            <div class="label">延長時間(h)</div>
             <div class="stepper">
                 <div class="btn" onclick="step('exTime', -1)">−</div>
                 <span class="count-value" id="exTimeText">0</span>
@@ -180,10 +185,11 @@
 
     function calculate() {
         const base = parseInt(document.getElementById('basePrice').value);
+        const exUnit = parseInt(document.getElementById('exUnitPrice').value);
         const otherP = parseInt(document.getElementById('otherPrice').value) || 0;
 
         const total = (base * data.personCount) +
-                      (1100 * data.exTime * data.exQty) +
+                      (exUnit * data.exTime * data.exQty) +
                       (550 * data.ins) +
                       (1100 * data.wet) +
                       (330 * data.boots) +
