@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>レンタル料金計算 v1.1.9 by Popolo App.com</title>
+    <title>レンタル料金計算 v1.2.0 by Popolo App.com</title>
     <style>
         :root {
             --ios-bg: #f2f2f7;
@@ -47,12 +47,14 @@
         
         .label { font-size: var(--font-main); font-weight: 600; flex-shrink: 0; margin-right: 10px; }
         
+        /* 中央揃えに修正 */
         select, input[type="number"] { 
             font-size: var(--font-main); 
             border: 2px solid #e5e5ea; 
             border-radius: 8px;
             background: #fafafa; 
-            text-align: right; 
+            text-align: center; /* 全体を中央へ */
+            text-align-last: center; /* 選択後の表示を中央へ */
             color: var(--ios-blue); 
             outline: none; 
             padding: 8px;
@@ -74,7 +76,7 @@
         <span class="app-name-label">レンタル料金計算 by Popolo App.com</span>
         <div class="total-label">合計金額 (税込)</div>
         <div class="total-amount">¥<span id="totalDisplay">0</span></div>
-        <span class="ver-label">Version 1.1.9</span>
+        <span class="ver-label">Version 1.2.0</span>
     </div>
 
     <div class="section-header">基本設定</div>
@@ -178,15 +180,10 @@
 
     function step(key, val) {
         data[key] = Math.max(0, data[key] + val);
-        
-        // --- 連動ロジックの追加 ---
         if (key === 'exTime' && data.personCount === 1) {
-            // 人数が1人のとき、延長時間が1h以上なら人数を1に、0hなら0に自動調整
             data.exQty = (data.exTime > 0) ? 1 : 0;
             document.getElementById('exQtyText').innerText = data.exQty;
         }
-        // -----------------------
-
         document.getElementById(key + 'Text').innerText = data[key];
         calculate();
     }
