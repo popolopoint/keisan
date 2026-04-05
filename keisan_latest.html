@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>レンタル料金計算 v1.2.0 by Popolo App.com</title>
+    <title>レンタル料金計算 v1.2.2 by Popolo App.com</title>
     <style>
         :root {
             --ios-bg: #f2f2f7;
@@ -47,18 +47,18 @@
         
         .label { font-size: var(--font-main); font-weight: 600; flex-shrink: 0; margin-right: 10px; }
         
-        /* 中央揃えに修正 */
         select, input[type="number"] { 
             font-size: var(--font-main); 
             border: 2px solid #e5e5ea; 
             border-radius: 8px;
             background: #fafafa; 
-            text-align: center; /* 全体を中央へ */
-            text-align-last: center; /* 選択後の表示を中央へ */
+            text-align: center;
+            text-align-last: center;
             color: var(--ios-blue); 
             outline: none; 
             padding: 8px;
             min-width: 180px;
+            max-width: 240px;
         }
         
         .stepper { display: flex; align-items: center; gap: 20px; background: #efeff4; border-radius: 10px; padding: 6px 12px; }
@@ -76,18 +76,20 @@
         <span class="app-name-label">レンタル料金計算 by Popolo App.com</span>
         <div class="total-label">合計金額 (税込)</div>
         <div class="total-amount">¥<span id="totalDisplay">0</span></div>
-        <span class="ver-label">Version 1.2.0</span>
+        <span class="ver-label">Version 1.2.2</span>
     </div>
 
     <div class="section-header">基本設定</div>
     <div class="section">
         <div class="row">
             <div class="label">プラン</div>
-            <select id="basePrice" onchange="calculate()">
+            <select id="basePrice" onchange="onPlanChange()">
                 <option value="5500">ウインドサーフィン ¥5,500</option>
                 <option value="7700">ウイングフォイル ¥7,700</option>
                 <option value="8800">ウインドフォイル ¥8,800</option>
                 <option value="4400">SUP ¥4,400</option>
+                <option value="6000" data-tokutai="true">特待生基本 ¥6,000</option>
+                <option value="7500" data-tokutai="true">特待生コミコミ ¥7,500</option>
             </select>
         </div>
         <div class="row">
@@ -178,12 +180,30 @@
         otherQty: 0
     };
 
+    function onPlanChange() {
+        const select = document.getElementById('basePrice');
+        const selectedOption = select.options[select.selectedIndex];
+        
+        // 特待生コースなら機材保険を0、それ以外なら1に自動設定
+        if (selectedOption.getAttribute('data-tokutai') === 'true') {
+            data.ins = 0;
+        } else {
+            data.ins = 1;
+        }
+        
+        document.getElementById('insText').innerText = data.ins;
+        calculate();
+    }
+
     function step(key, val) {
         data[key] = Math.max(0, data[key] + val);
+        
+        // 延長時間と人数の連動ロジック (1名時)
         if (key === 'exTime' && data.personCount === 1) {
             data.exQty = (data.exTime > 0) ? 1 : 0;
             document.getElementById('exQtyText').innerText = data.exQty;
         }
+
         document.getElementById(key + 'Text').innerText = data[key];
         calculate();
     }
