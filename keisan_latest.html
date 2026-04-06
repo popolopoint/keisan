@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>レンタル料金計算 v1.2.2 by Popolo App.com</title>
+    <title>レンタル料金計算 v1.2.6 by Popolo App.com</title>
     <style>
         :root {
             --ios-bg: #f2f2f7;
@@ -11,72 +11,52 @@
             --ios-blue: #007aff;
             --ios-gray: #8e8e93;
             --ios-border: #c6c6c8;
-            --font-main: 22px;
         }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--ios-bg);
-            margin: 0;
-            padding: 10px;
-            color: #000;
-        }
-        .container { max-width: 500px; margin: 0 auto; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--ios-bg); margin: 0; padding: 10px; color: #000; }
+        .container { max-width: 500px; margin: 0 auto; padding-bottom: 50px; }
         
         .total-display-card {
-            background: var(--ios-blue);
-            color: white;
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 20px rgba(0,122,255,0.3);
-            position: sticky;
-            top: 10px;
-            z-index: 100;
+            background: var(--ios-blue); color: white; border-radius: 15px; padding: 20px; text-align: center;
+            margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0,122,255,0.3); position: sticky; top: 10px; z-index: 100;
         }
-        .app-name-label { font-size: 16px; font-weight: bold; opacity: 0.9; margin-bottom: 5px; display: block; }
-        .total-label { font-size: 18px; opacity: 0.8; }
-        .total-amount { font-size: 48px; font-weight: bold; margin: 5px 0; }
-        .ver-label { font-size: 12px; text-align: right; display: block; opacity: 0.7; margin-top: 5px; }
-
-        .section-header { font-size: 18px; color: var(--ios-gray); margin: 0 0 8px 15px; font-weight: bold; }
-        .section { background: var(--ios-card); border-radius: 12px; margin-bottom: 25px; overflow: hidden; border: 1px solid var(--ios-border); }
+        .total-amount { font-size: 42px; font-weight: bold; margin: 5px 0; }
+        .discount-area { background: rgba(255,255,255,0.2); border-radius: 8px; padding: 10px; margin-top: 10px; display: none; }
+        .discount-area.active { display: block; }
         
-        .row { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 0.5px solid var(--ios-border); }
+        .section-header { font-size: 16px; color: var(--ios-gray); margin: 0 0 8px 15px; font-weight: bold; }
+        .section { background: var(--ios-card); border-radius: 12px; margin-bottom: 20px; overflow: hidden; border: 1px solid var(--ios-border); }
+        .row { display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; border-bottom: 0.5px solid var(--ios-border); }
         .row:last-child { border-bottom: none; }
+        .label { font-size: 18px; font-weight: 600; }
+        .price-info { font-size: 18px; color: var(--ios-gray); font-weight: normal; margin-left: 5px; }
         
-        .label { font-size: var(--font-main); font-weight: 600; flex-shrink: 0; margin-right: 10px; }
-        
-        select, input[type="number"] { 
-            font-size: var(--font-main); 
-            border: 2px solid #e5e5ea; 
-            border-radius: 8px;
-            background: #fafafa; 
-            text-align: center;
-            text-align-last: center;
-            color: var(--ios-blue); 
-            outline: none; 
-            padding: 8px;
-            min-width: 180px;
-            max-width: 240px;
-        }
-        
-        .stepper { display: flex; align-items: center; gap: 20px; background: #efeff4; border-radius: 10px; padding: 6px 12px; }
-        .btn { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; color: var(--ios-blue); cursor: pointer; user-select: none; }
-        .count-value { min-width: 35px; text-align: center; font-size: 26px; font-weight: bold; font-variant-numeric: tabular-nums; }
-        
-        .footer { text-align: center; font-size: 16px; color: var(--ios-gray); margin: 40px 0; }
-        .price-info { font-size: 14px; color: var(--ios-gray); display: block; font-weight: normal; }
+        select, .input-price { font-size: 18px; border: 1px solid var(--ios-border); border-radius: 8px; background: #fafafa; text-align: center; text-align-last: center; color: var(--ios-blue); padding: 8px; min-width: 140px; }
+        .input-price { width: 140px; }
+
+        .stepper { display: flex; align-items: center; gap: 15px; background: #efeff4; border-radius: 10px; padding: 4px 10px; }
+        .btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: var(--ios-blue); cursor: pointer; user-select: none; }
+        .count-value { min-width: 30px; text-align: center; font-size: 22px; font-weight: bold; }
+
+        .details-area { background: #f9f9f9; padding: 0 15px; border-top: 0.5px dashed var(--ios-border); }
+        .detail-row { padding: 10px 0; border-bottom: 0.5px solid #eee; display: flex; flex-direction: column; gap: 8px; }
+        .select-sub { flex: 1; font-size: 18px; padding: 8px; }
+        .footer { text-align: center; font-size: 14px; color: var(--ios-gray); margin-top: 20px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="total-display-card">
-        <span class="app-name-label">レンタル料金計算 by Popolo App.com</span>
-        <div class="total-label">合計金額 (税込)</div>
+        <span style="font-size:14px; opacity:0.9;">レンタル料金計算 by Popolo App.com</span>
         <div class="total-amount">¥<span id="totalDisplay">0</span></div>
-        <span class="ver-label">Version 1.2.2</span>
+        <div id="discountArea" class="discount-area">
+            <span style="font-size:14px;">前日予約割引 (-¥1,000)</span><br>
+            <select id="isDiscount" onchange="calculate()" style="min-width:100px; margin-top:5px; font-size:14px; padding:4px; text-align-last: center;">
+                <option value="0">ナシ</option>
+                <option value="1000">アリ</option>
+            </select>
+        </div>
+        <span style="font-size:11px; text-align:right; display:block; opacity:0.7;">Version 1.2.6</span>
     </div>
 
     <div class="section-header">基本設定</div>
@@ -84,150 +64,108 @@
         <div class="row">
             <div class="label">プラン</div>
             <select id="basePrice" onchange="onPlanChange()">
-                <option value="5500">ウインドサーフィン ¥5,500</option>
-                <option value="7700">ウイングフォイル ¥7,700</option>
-                <option value="8800">ウインドフォイル ¥8,800</option>
-                <option value="4400">SUP ¥4,400</option>
-                <option value="6000" data-tokutai="true">特待生基本 ¥6,000</option>
-                <option value="7500" data-tokutai="true">特待生コミコミ ¥7,500</option>
+                <option value="5500" data-ext="1100">ウインドサーフィンset ¥5,500</option>
+                <option value="7700" data-ext="1100">ウイングフォイルset ¥7,700</option>
+                <option value="8800" data-ext="1100">ウインドフォイルset ¥8,800</option>
+                <option value="4400" data-ext="550">SUP ¥4,400</option>
+                <option value="4400" data-ext="550">ボードのみ ¥4,400</option>
+                <option value="4400" data-ext="550">セイル/ウイング/パラのみ ¥4,400</option>
+                <option value="4400" data-ext="550">フォイルのみ ¥4,400</option>
+                <option value="7000" data-ext="1100" data-tokutai="true">特待生基本 ¥7,000</option>
+                <option value="8500" data-ext="1100" data-tokutai="true">特待生コミコミ ¥8,500</option>
             </select>
         </div>
         <div class="row">
             <div class="label">人数</div>
-            <div class="stepper">
-                <div class="btn" onclick="step('personCount', -1)">−</div>
-                <span class="count-value" id="personCountText">1</span>
-                <div class="btn" onclick="step('personCount', 1)">＋</div>
-            </div>
+            <div class="stepper"><div class="btn" onclick="step('personCount', -1)">−</div><span class="count-value" id="personCountText">1</span><div class="btn" onclick="step('personCount', 1)">＋</div></div>
         </div>
     </div>
 
-    <div class="section-header">時間延長設定</div>
+    <div class="section-header">時間延長</div>
     <div class="section">
-        <div class="row">
-            <div class="label">延長単価</div>
-            <select id="exUnitPrice" onchange="calculate()">
-                <option value="1100" selected>¥1,100</option>
-                <option value="550">¥550</option>
-            </select>
-        </div>
-        <div class="row">
-            <div class="label">延長時間(h)</div>
-            <div class="stepper">
-                <div class="btn" onclick="step('exTime', -1)">−</div>
-                <span class="count-value" id="exTimeText">0</span>
-                <div class="btn" onclick="step('exTime', 1)">＋</div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="label">延長人数</div>
-            <div class="stepper">
-                <div class="btn" onclick="step('exQty', -1)">−</div>
-                <span class="count-value" id="exQtyText">0</span>
-                <div class="btn" onclick="step('exQty', 1)">＋</div>
-            </div>
-        </div>
+        <div class="row"><div class="label">延長単価</div><select id="exUnitPrice" onchange="calculate()"><option value="1100">¥1,100</option><option value="550">¥550</option></select></div>
+        <div class="row"><div class="label">時間(h)</div><div class="stepper"><div class="btn" onclick="step('exTime', -1)">−</div><span class="count-value" id="exTimeText">0</span><div class="btn" onclick="step('exTime', 1)">＋</div></div></div>
+        <div class="row"><div class="label">延長人数</div><div class="stepper"><div class="btn" onclick="step('exQty', -1)">−</div><span class="count-value" id="exQtyText">0</span><div class="btn" onclick="step('exQty', 1)">＋</div></div></div>
     </div>
 
     <div class="section-header">オプション</div>
     <div class="section">
-        <div class="row"><div class="label">機材保険<span class="price-info">¥550</span></div>
-            <div class="stepper"><div class="btn" onclick="step('ins', -1)">−</div><span class="count-value" id="insText">1</span><div class="btn" onclick="step('ins', 1)">＋</div></div>
-        </div>
-        <div class="row"><div class="label">ウェット<span class="price-info">¥1,100</span></div>
-            <div class="stepper"><div class="btn" onclick="step('wet', -1)">−</div><span class="count-value" id="wetText">0</span><div class="btn" onclick="step('wet', 1)">＋</div></div>
-        </div>
-        <div class="row"><div class="label">ブーツ<span class="price-info">¥330</span></div>
-            <div class="stepper"><div class="btn" onclick="step('boots', -1)">−</div><span class="count-value" id="bootsText">0</span><div class="btn" onclick="step('boots', 1)">＋</div></div>
-        </div>
-        <div class="row"><div class="label">レッスンA<span class="price-info">¥1,100</span></div>
-            <div class="stepper"><div class="btn" onclick="step('lesA', -1)">−</div><span class="count-value" id="lesAText">0</span><div class="btn" onclick="step('lesA', 1)">＋</div></div>
-        </div>
-        <div class="row"><div class="label">レッスンB<span class="price-info">¥3,300</span></div>
-            <div class="stepper"><div class="btn" onclick="step('lesB', -1)">−</div><span class="count-value" id="lesBText">0</span><div class="btn" onclick="step('lesB', 1)">＋</div></div>
-        </div>
-        <div class="row"><div class="label">グレードUP<span class="price-info">¥1,100</span></div>
-            <div class="stepper"><div class="btn" onclick="step('upg', -1)">−</div><span class="count-value" id="upgText">0</span><div class="btn" onclick="step('upg', 1)">＋</div></div>
-        </div>
+        <div class="row"><div class="label">機材保険<span class="price-info">¥550</span></div><div class="stepper"><div class="btn" onclick="step('ins', -1)">−</div><span class="count-value" id="insText">1</span><div class="btn" onclick="step('ins', 1)">＋</div></div></div>
+        <div class="row"><div class="label">ハーネス<span class="price-info">¥550</span></div><div class="stepper"><div class="btn" onclick="step('harness', -1)">−</div><span class="count-value" id="harnessText">0</span><div class="btn" onclick="step('harness', 1)">＋</div></div></div>
+        <div id="harnessDetails" class="details-area"></div>
+        <div class="row"><div class="label">ウェット<span class="price-info">¥1,100</span></div><div class="stepper"><div class="btn" onclick="step('wet', -1)">−</div><span class="count-value" id="wetText">0</span><div class="btn" onclick="step('wet', 1)">＋</div></div></div>
+        <div id="wetDetails" class="details-area"></div>
+        <div class="row"><div class="label">ブーツ<span class="price-info">¥330</span></div><div class="stepper"><div class="btn" onclick="step('boots', -1)">−</div><span class="count-value" id="bootsText">0</span><div class="btn" onclick="step('boots', 1)">＋</div></div></div>
+        <div id="bootsDetails" class="details-area"></div>
+        <div class="row"><div class="label">レッスンA<span class="price-info">¥1,100</span></div><div class="stepper"><div class="btn" onclick="step('lesA', -1)">−</div><span class="count-value" id="lesAText">0</span><div class="btn" onclick="step('lesA', 1)">＋</div></div></div>
+        <div class="row"><div class="label">レッスンB<span class="price-info">¥3,300</span></div><div class="stepper"><div class="btn" onclick="step('lesB', -1)">−</div><span class="count-value" id="lesBText">0</span><div class="btn" onclick="step('lesB', 1)">＋</div></div></div>
+        <div class="row"><div class="label">グレードUP<span class="price-info">¥1,100</span></div><div class="stepper"><div class="btn" onclick="step('upg', -1)">−</div><span class="count-value" id="upgText">0</span><div class="btn" onclick="step('upg', 1)">＋</div></div></div>
         <div class="row">
-            <div class="label">その他単価</div>
-            <input type="number" id="otherPrice" value="0" oninput="calculate()">
-        </div>
-        <div class="row">
-            <div class="label">その他数量</div>
-            <div class="stepper">
-                <div class="btn" onclick="step('otherQty', -1)">−</div>
-                <span class="count-value" id="otherQtyText">0</span>
-                <div class="btn" onclick="step('otherQty', 1)">＋</div>
-            </div>
+            <div class="label">その他</div>
+            <input type="number" id="otherPrice" class="input-price" placeholder="金額入力" oninput="calculate()">
         </div>
     </div>
-
     <div class="footer">by Popolo App.com</div>
 </div>
 
 <script>
-    let data = {
-        personCount: 1,
-        exTime: 0,
-        exQty: 0,
-        ins: 1,
-        wet: 0,
-        boots: 0,
-        lesA: 0,
-        lesB: 0,
-        upg: 0,
-        otherQty: 0
-    };
+    let data = { personCount: 1, exTime: 0, exQty: 0, ins: 1, harness: 0, wet: 0, boots: 0, lesA: 0, lesB: 0, upg: 0 };
 
     function onPlanChange() {
         const select = document.getElementById('basePrice');
-        const selectedOption = select.options[select.selectedIndex];
-        
-        // 特待生コースなら機材保険を0、それ以外なら1に自動設定
-        if (selectedOption.getAttribute('data-tokutai') === 'true') {
-            data.ins = 0;
-        } else {
-            data.ins = 1;
-        }
-        
+        const opt = select.options[select.selectedIndex];
+        const isTokutai = opt.getAttribute('data-tokutai') === 'true';
+        const extPrice = opt.getAttribute('data-ext');
+
+        document.getElementById('exUnitPrice').value = extPrice;
+        data.ins = isTokutai ? 0 : 1;
         document.getElementById('insText').innerText = data.ins;
+
+        const discArea = document.getElementById('discountArea');
+        if(isTokutai) { discArea.classList.add('active'); } 
+        else { discArea.classList.remove('active'); document.getElementById('isDiscount').value = "0"; }
+
         calculate();
     }
 
     function step(key, val) {
         data[key] = Math.max(0, data[key] + val);
-        
-        // 延長時間と人数の連動ロジック (1名時)
         if (key === 'exTime' && data.personCount === 1) {
             data.exQty = (data.exTime > 0) ? 1 : 0;
             document.getElementById('exQtyText').innerText = data.exQty;
         }
-
         document.getElementById(key + 'Text').innerText = data[key];
+        updateDetailFields();
         calculate();
+    }
+
+    function generateRangeOptions(min, max, step, suffix) {
+        let html = '';
+        for(let i=min; i<max; i+=step) { html += `<option value="${i}">${i}〜${i+step}${suffix}</option>`; }
+        return html;
+    }
+
+    function updateDetailFields() {
+        const hDiv = document.getElementById('harnessDetails'); hDiv.innerHTML = '';
+        for(let i=1; i<=data.harness; i++) hDiv.innerHTML += `<div class="detail-row"><div style="font-size:12px; color:var(--ios-blue);">ハーネス ${i}人目</div><select class="select-sub"><option>ウエスト選択</option>${generateRangeOptions(50, 120, 5, 'cm')}</select></div>`;
+        const wDiv = document.getElementById('wetDetails'); wDiv.innerHTML = '';
+        for(let i=1; i<=data.wet; i++) wDiv.innerHTML += `<div class="detail-row"><div style="font-size:12px; color:var(--ios-blue);">ウェット ${i}人目</div><div style="display:flex; gap:5px;"><select class="select-sub"><option>性別</option><option>男</option><option>女</option></select><select class="select-sub"><option>身長</option>${generateRangeOptions(130, 200, 5, 'cm')}</select><select class="select-sub"><option>体重</option>${generateRangeOptions(30, 120, 5, 'kg')}</select></div></div>`;
+        const bDiv = document.getElementById('bootsDetails'); bDiv.innerHTML = '';
+        for(let i=1; i<=data.boots; i++) bDiv.innerHTML += `<div class="detail-row"><div style="font-size:12px; color:var(--ios-blue);">ブーツ ${i}人目</div><select class="select-sub"><option>サイズ選択</option>${(function(){let h=''; for(let j=18;j<=30;j++)h+=`<option value="${j}">${j}cm</option>`; return h;})()}</select></div>`;
     }
 
     function calculate() {
         const base = parseInt(document.getElementById('basePrice').value);
         const exUnit = parseInt(document.getElementById('exUnitPrice').value);
+        const discount = parseInt(document.getElementById('isDiscount').value);
         const otherP = parseInt(document.getElementById('otherPrice').value) || 0;
 
-        const total = (base * data.personCount) +
-                      (exUnit * data.exTime * data.exQty) +
-                      (550 * data.ins) +
-                      (1100 * data.wet) +
-                      (330 * data.boots) +
-                      (1100 * data.lesA) +
-                      (3300 * data.lesB) +
-                      (1100 * data.upg) +
-                      (otherP * data.otherQty);
-
+        const total = (base * data.personCount) - discount + (exUnit * data.exTime * data.exQty) +
+                      (550 * data.ins) + (550 * data.harness) + (1100 * data.wet) + (330 * data.boots) +
+                      (1100 * data.lesA) + (3300 * data.lesB) + (1100 * data.upg) + otherP;
         document.getElementById('totalDisplay').innerText = total.toLocaleString();
     }
-
     calculate();
 </script>
-
 </body>
 </html>
