@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>レンタル料金計算 v2.1.1 by Popolo App.com</title>
+    <title>レンタル料金計算 v2.1.2 by Popolo App.com</title>
     <style>
         :root {
             --ios-bg: #f2f2f7;
@@ -49,9 +49,6 @@
         .checkbox-item { background: #fff; border: 1px solid var(--ios-border); border-radius: 6px; padding: 8px 12px; font-size: 16px; display: flex; align-items: center; gap: 5px; }
         
         .cat-title { font-size: 14px; font-weight: bold; color: #fff; background: var(--ios-gray); padding: 4px 10px; border-radius: 4px; display: inline-block; margin-bottom: 5px; }
-        .cat-wind { background: #5856d6; }
-        .cat-wing { background: #af52de; }
-
         .footer { text-align: center; font-size: 14px; color: var(--ios-gray); margin: 20px 0; }
     </style>
 </head>
@@ -68,7 +65,7 @@
                 <option value="1000">アリ</option>
             </select>
         </div>
-        <span style="font-size:11px; text-align:right; display:block; opacity:0.7;">Version 2.1.1</span>
+        <span style="font-size:11px; text-align:right; display:block; opacity:0.7;">Version 2.1.2</span>
     </div>
 
     <div class="section-header">基本設定</div>
@@ -120,31 +117,31 @@
         <button class="request-btn" onclick="toggleRequest()">リクエスト設定を開く/閉じる</button>
         <div id="requestArea" class="request-content">
             <div class="detail-row">
-                <div class="cat-title cat-wind">ウインドサーフィン用</div>
-                <span class="label" style="font-size:14px;color:#000;">ボード 微風時（最大サイズ）</span>
+                <div class="cat-title" style="background:#5856d6;">ウインドサーフィン用</div>
+                <span style="font-size:14px;">ボード 微風時（最大）</span>
                 <select id="windBoardMax" class="select-sub">
                     <option value="">未選択</option>
                     <option>ダガー付ボード</option><option>140以上</option><option>130</option><option>120</option><option>110</option><option>100以下</option>
                 </select>
-                <span class="label" style="font-size:14px;color:#000;margin-top:10px;">ボード 強風時（小）</span>
+                <span style="font-size:14px;margin-top:10px;">ボード 強風時（小）</span>
                 <select id="windBoardMin" class="select-sub">
                     <option value="">未選択</option>
                     <option>微風時と同じ</option><option>110</option><option>100</option><option>80〜100</option><option>60〜80</option>
                 </select>
-                <span class="label" style="font-size:14px;color:#000;margin-top:10px;">セイル 微風時（最大）</span>
+                <span style="font-size:14px;margin-top:10px;">セイル 微風時（最大）</span>
                 <select id="windSailMax" class="select-sub">
                     <option value="">未選択</option>
                     <option>8.5</option><option>7.0〜7.5</option><option>6.5</option><option>6.0</option><option>5.5</option><option>5.0以下</option>
                 </select>
             </div>
             <div class="detail-row">
-                <div class="cat-title cat-wing">ウイングフォイル用</div>
-                <span class="label" style="font-size:14px;color:#000;">ボード（普段使うサイズ）</span>
+                <div class="cat-title" style="background:#af52de;">ウイングフォイル用</div>
+                <span style="font-size:14px;">ボード（普段使うサイズ）</span>
                 <select id="wingBoardSize" class="select-sub">
                     <option value="">未選択</option>
                     <option>120以上</option><option>110〜120</option><option>100〜110</option><option>90〜100</option><option>80〜90</option><option>70〜80</option><option>60〜70</option><option>60以下</option>
                 </select>
-                <span class="label" style="font-size:14px;color:#000;margin-top:10px;">フォイル（複数選択可）</span>
+                <span style="font-size:14px;margin-top:10px;">フォイル（複数選択可）</span>
                 <div class="checkbox-group" id="wingFoilGroup">
                     <label class="checkbox-item"><input type="checkbox" value="2000"> 2000</label>
                     <label class="checkbox-item"><input type="checkbox" value="1500"> 1500</label>
@@ -227,25 +224,31 @@
         const planSelect = document.getElementById('basePrice');
         const planName = planSelect.options[planSelect.selectedIndex].text;
         const total = document.getElementById('totalDisplay').innerText;
+        const discountVal = parseInt(document.getElementById('isDiscount').value);
         
         let details = `【予約内容】\nプラン: ${planName}\n人数: ${data.personCount}名\n合計金額: ¥${total}\n`;
+        
+        if(discountVal > 0) details += `割引: 前日予約割引クーポン適用 (-¥1,000)\n`;
         if(data.exTime > 0) details += `延長: ${data.exTime}h (${data.exQty}名分)\n`;
+        
+        // 保険
+        details += `機材保険: ${data.ins > 0 ? 'あり (¥' + (550*data.ins) + ')' : 'なし'}\n`;
         
         // オプション詳細
         if(data.harness > 0) {
             details += "\n▼ハーネスサイズ:\n";
-            document.querySelectorAll('.harness-val').forEach((el, i) => details += `${i+1}人目:${el.value}\n`);
+            document.querySelectorAll('.harness-val').forEach((el, i) => details += `${i+1}人目:${el.value || '未選択'}\n`);
         }
         if(data.wet > 0) {
             details += "\n▼ウェットサイズ:\n";
             const sexes = document.querySelectorAll('.wet-sex');
             const hs = document.querySelectorAll('.wet-h');
             const ws = document.querySelectorAll('.wet-w');
-            sexes.forEach((el, i) => details += `${i+1}人目:${el.value}/${hs[i].value}/${ws[i].value}\n`);
+            sexes.forEach((el, i) => details += `${i+1}人目:${el.value || '?'}/${hs[i].value || '?'}/${ws[i].value || '?'}\n`);
         }
         if(data.boots > 0) {
             details += "\n▼ブーツサイズ:\n";
-            document.querySelectorAll('.boots-val').forEach((el, i) => details += `${i+1}人目:${el.value}cm\n`);
+            document.querySelectorAll('.boots-val').forEach((el, i) => details += `${i+1}人目:${el.value || '未選択'}cm\n`);
         }
 
         // リクエスト詳細
@@ -253,12 +256,12 @@
         const wMax = document.getElementById('windBoardMax').value;
         const wMin = document.getElementById('windBoardMin').value;
         const wSail = document.getElementById('windSailMax').value;
-        if(wMax || wMin || wSail) req += `ウインド: ボード大(${wMax}) 小(${wMin}) セイル(${wSail})\n`;
+        if(wMax || wMin || wSail) req += `ウインド: ボード大(${wMax || '-'}) 小(${wMin || '-'}) セイル(${wSail || '-'})\n`;
         
         const wingB = document.getElementById('wingBoardSize').value;
         let wingF = [];
         document.querySelectorAll('#wingFoilGroup input:checked').forEach(el => wingF.push(el.value));
-        if(wingB || wingF.length > 0) req += `ウイング: ボード(${wingB}) フォイル(${wingF.join(',')})\n`;
+        if(wingB || wingF.length > 0) req += `ウイング: ボード(${wingB || '-'}) フォイル(${wingF.join(',') || '-'})\n`;
 
         const memo = document.getElementById('memo').value;
         if(memo) req += `\n【備考】\n${memo}`;
@@ -266,7 +269,6 @@
         const fullText = details + req;
         const encodedText = encodeURIComponent(fullText);
         
-        // GoogleフォームのURL（entry.1964882866 にお名前欄として全データを流し込む）
         const formUrl = `https://docs.google.com/forms/d/e/1FAIpQLSdndrKiaXraqJiEUL27qMQOz23pbquxVdUFEOrOLKQa0Qfh2g/viewform?usp=pp_url&entry.1964882866=${encodedText}`;
         
         window.location.href = formUrl;
