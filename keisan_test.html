@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>レンタル料金計算 v1.2.7 by Popolo App.com</title>
+    <title>レンタル料金計算 v1.2.8 by Popolo App.com</title>
     <style>
         :root {
             --ios-bg: #f2f2f7;
@@ -42,6 +42,13 @@
         .count-value { min-width: 30px; text-align: center; font-size: 22px; font-weight: bold; }
 
         .detail-row { padding: 12px 15px; border-bottom: 0.5px solid #eee; display: flex; flex-direction: column; gap: 5px; }
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; padding: 5px 0; }
+        .checkbox-item { background: #fff; border: 1px solid var(--ios-border); border-radius: 6px; padding: 8px 12px; font-size: 16px; display: flex; align-items: center; gap: 5px; }
+        
+        .cat-title { font-size: 14px; font-weight: bold; color: #fff; background: var(--ios-gray); padding: 4px 10px; border-radius: 4px; display: inline-block; margin-bottom: 5px; }
+        .cat-wind { background: #5856d6; }
+        .cat-wing { background: #af52de; }
+
         .footer { text-align: center; font-size: 14px; color: var(--ios-gray); margin-top: 20px; }
     </style>
 </head>
@@ -58,7 +65,7 @@
                 <option value="1000">アリ</option>
             </select>
         </div>
-        <span style="font-size:11px; text-align:right; display:block; opacity:0.7;">Version 1.2.7</span>
+        <span style="font-size:11px; text-align:right; display:block; opacity:0.7;">Version 1.2.8</span>
     </div>
 
     <div class="section-header">基本設定</div>
@@ -110,7 +117,8 @@
         <button class="request-btn" onclick="toggleRequest()">リクエスト設定を開く/閉じる</button>
         <div id="requestArea" class="request-content">
             <div class="detail-row">
-                <span class="label" style="font-size:14px;color:#000;">ボード 微風時（ダガー付/大）</span>
+                <div class="cat-title cat-wind">ウインドサーフィン用</div>
+                <span class="label" style="font-size:14px;color:#000;">ボード 微風時（最大サイズ）</span>
                 <select class="select-sub">
                     <option value="">選択してください</option>
                     <option>ダガー付ボード</option>
@@ -120,9 +128,7 @@
                     <option>110</option>
                     <option>100以下</option>
                 </select>
-            </div>
-            <div class="detail-row">
-                <span class="label" style="font-size:14px;color:#000;">ボード 強風時（小）</span>
+                <span class="label" style="font-size:14px;color:#000;margin-top:10px;">ボード 強風時（小）</span>
                 <select class="select-sub">
                     <option value="">選択してください</option>
                     <option>微風時と同じ</option>
@@ -131,9 +137,7 @@
                     <option>80〜100</option>
                     <option>60〜80</option>
                 </select>
-            </div>
-            <div class="detail-row">
-                <span class="label" style="font-size:14px;color:#000;">セイル 微風時（最大サイズ）</span>
+                <span class="label" style="font-size:14px;color:#000;margin-top:10px;">セイル 微風時（最大）</span>
                 <select class="select-sub">
                     <option value="">選択してください</option>
                     <option>8.5</option>
@@ -143,6 +147,30 @@
                     <option>5.5</option>
                     <option>5.0以下</option>
                 </select>
+            </div>
+
+            <div class="detail-row">
+                <div class="cat-title cat-wing">ウイングフォイル用</div>
+                <span class="label" style="font-size:14px;color:#000;">ボード（普段使うサイズ）</span>
+                <select class="select-sub">
+                    <option value="">選択してください</option>
+                    <option>120以上</option>
+                    <option>110〜120</option>
+                    <option>100〜110</option>
+                    <option>90〜100</option>
+                    <option>80〜90</option>
+                    <option>70〜80</option>
+                    <option>60〜70</option>
+                    <option>60以下</option>
+                </select>
+                <span class="label" style="font-size:14px;color:#000;margin-top:10px;">フォイル（複数選択可）</span>
+                <div class="checkbox-group">
+                    <label class="checkbox-item"><input type="checkbox"> 2000</label>
+                    <label class="checkbox-item"><input type="checkbox"> 1500</label>
+                    <label class="checkbox-item"><input type="checkbox"> 1200</label>
+                    <label class="checkbox-item"><input type="checkbox"> 1000</label>
+                    <label class="checkbox-item"><input type="checkbox"> 900以下</label>
+                </div>
             </div>
         </div>
     </div>
