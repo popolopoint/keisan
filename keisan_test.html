@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>レンタル料金計算 v1.2.3 by Popolo App.com</title>
+    <title>レンタル料金計算 v1.2.4 by Popolo App.com</title>
     <style>
         :root {
             --ios-bg: #f2f2f7;
@@ -45,6 +45,7 @@
         .row:last-child { border-bottom: none; }
         
         .label { font-size: 18px; font-weight: 600; flex-shrink: 0; }
+        .price-info { font-size: 18px; color: var(--ios-gray); display: inline-block; font-weight: normal; margin-left: 5px; }
         
         select { 
             font-size: 18px; 
@@ -61,16 +62,15 @@
         .btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: var(--ios-blue); cursor: pointer; user-select: none; }
         .count-value { min-width: 30px; text-align: center; font-size: 22px; font-weight: bold; }
 
-        /* 詳細入力エリア（サイズなど） */
+        /* 詳細入力エリア */
         .details-area { background: #f9f9f9; padding: 0 15px; border-top: 0.5px dashed var(--ios-border); }
         .detail-row { padding: 10px 0; border-bottom: 0.5px solid #eee; display: flex; flex-direction: column; gap: 8px; }
         .detail-row:last-child { border-bottom: none; }
         .detail-title { font-size: 14px; color: var(--ios-blue); font-weight: bold; }
         .select-group { display: flex; gap: 5px; flex-wrap: wrap; }
-        .select-sub { flex: 1; min-width: 80px; font-size: 14px; padding: 5px; }
+        .select-sub { flex: 1; min-width: 120px; font-size: 18px; padding: 8px; }
 
         .footer { text-align: center; font-size: 14px; color: var(--ios-gray); margin-top: 20px; }
-        .price-info { font-size: 12px; color: var(--ios-gray); display: block; font-weight: normal; }
     </style>
 </head>
 <body>
@@ -79,7 +79,7 @@
     <div class="total-display-card">
         <span class="app-name-label">レンタル料金計算 by Popolo App.com</span>
         <div class="total-amount">¥<span id="totalDisplay">0</span></div>
-        <span class="ver-label">Version 1.2.3</span>
+        <span class="ver-label">Version 1.2.4</span>
     </div>
 
     <div class="section-header">基本設定</div>
@@ -103,6 +103,13 @@
                 <div class="btn" onclick="step('personCount', 1)">＋</div>
             </div>
         </div>
+    </div>
+
+    <div class="section-header">時間延長</div>
+    <div class="section">
+        <div class="row"><div class="label">延長単価</div><select id="exUnitPrice" onchange="calculate()"><option value="1100">¥1,100</option><option value="550">¥550</option></select></div>
+        <div class="row"><div class="label">時間(h)</div><div class="stepper"><div class="btn" onclick="step('exTime', -1)">−</div><span class="count-value" id="exTimeText">0</span><div class="btn" onclick="step('exTime', 1)">＋</div></div></div>
+        <div class="row"><div class="label">延長人数</div><div class="stepper"><div class="btn" onclick="step('exQty', -1)">−</div><span class="count-value" id="exQtyText">0</span><div class="btn" onclick="step('exQty', 1)">＋</div></div></div>
     </div>
 
     <div class="section-header">オプション</div>
@@ -136,13 +143,6 @@
         </div>
     </div>
 
-    <div class="section-header">時間延長</div>
-    <div class="section">
-        <div class="row"><div class="label">延長単価</div><select id="exUnitPrice" onchange="calculate()"><option value="1100">¥1,100</option><option value="550">¥550</option></select></div>
-        <div class="row"><div class="label">時間(h)</div><div class="stepper"><div class="btn" onclick="step('exTime', -1)">−</div><span class="count-value" id="exTimeText">0</span><div class="btn" onclick="step('exTime', 1)">＋</div></div></div>
-        <div class="row"><div class="label">延長人数</div><div class="stepper"><div class="btn" onclick="step('exQty', -1)">−</div><span class="count-value" id="exQtyText">0</span><div class="btn" onclick="step('exQty', 1)">＋</div></div></div>
-    </div>
-
     <div class="footer">by Popolo App.com</div>
 </div>
 
@@ -170,39 +170,48 @@
         calculate();
     }
 
-    function generateOptions(min, max, suffix, step=1) {
+    // 範囲表示用オプション生成
+    function generateRangeOptions(min, max, step, suffix) {
         let html = '';
-        for(let i=min; i<=max; i+=step) { html += `<option value="${i}">${i}${suffix}</option>`; }
+        for(let i=min; i<max; i+=step) {
+            html += `<option value="${i}">${i}〜${i+step}${suffix}</option>`;
+        }
+        return html;
+    }
+
+    // 単一数値用オプション生成
+    function generateOptions(min, max, suffix) {
+        let html = '';
+        for(let i=min; i<=max; i++) {
+            html += `<option value="${i}">${i}${suffix}</option>`;
+        }
         return html;
     }
 
     function updateDetailFields() {
-        // ハーネス詳細
         const hDiv = document.getElementById('harnessDetails');
         hDiv.innerHTML = '';
         for(let i=1; i<=data.harness; i++) {
             hDiv.innerHTML += `<div class="detail-row"><div class="detail-title">ハーネス ${i}人目</div>
-                <div class="select-group"><select class="select-sub"><option>ウエストサイズ選択</option>${generateOptions(50, 120, 'cm')}</select></div></div>`;
+                <div class="select-group"><select class="select-sub"><option>ウエスト選択</option>${generateRangeOptions(50, 120, 5, 'cm')}</select></div></div>`;
         }
 
-        // ウェット詳細
         const wDiv = document.getElementById('wetDetails');
         wDiv.innerHTML = '';
         for(let i=1; i<=data.wet; i++) {
             wDiv.innerHTML += `<div class="detail-row"><div class="detail-title">ウェット ${i}人目</div>
                 <div class="select-group">
                     <select class="select-sub"><option>性別</option><option>男性</option><option>女性</option></select>
-                    <select class="select-sub"><option>身長</option>${generateOptions(130, 200, 'cm')}</select>
-                    <select class="select-sub"><option>体重</option>${generateOptions(30, 120, 'kg')}</select>
+                    <select class="select-sub"><option>身長選択</option>${generateRangeOptions(130, 200, 5, 'cm')}</select>
+                    <select class="select-sub"><option>体重選択</option>${generateRangeOptions(30, 120, 5, 'kg')}</select>
                 </div></div>`;
         }
 
-        // ブーツ詳細
         const bDiv = document.getElementById('bootsDetails');
         bDiv.innerHTML = '';
         for(let i=1; i<=data.boots; i++) {
             bDiv.innerHTML += `<div class="detail-row"><div class="detail-title">ブーツ ${i}人目</div>
-                <div class="select-group"><select class="select-sub"><option>サイズ選択</option>${generateOptions(18, 30, 'cm', 0.5)}</select></div></div>`;
+                <div class="select-group"><select class="select-sub"><option>サイズ選択</option>${generateOptions(18, 30, 'cm')}</select></div></div>`;
         }
     }
 
