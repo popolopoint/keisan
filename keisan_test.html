@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>レンタル料金計算 v2.1.8e by Popolo App.com</title>
+    <title>レンタル料金計算 v2.1.8f by Popolo App.com</title>
     <style>
         :root {
             --ios-bg: #f2f2f7;
@@ -28,26 +28,13 @@
         .row:last-child { border-bottom: none; }
         .label { font-size: 18px; font-weight: 600; flex: 1; }
         
-        /* メインの選択窓 */
         .select-wrapper { position: relative; width: 100%; }
         select, .input-price { 
-            font-size: 32px; 
-            font-weight: bold;
-            border: 2px solid var(--ios-border); 
-            border-radius: 12px; 
-            background: #f8f8fa; 
-            color: var(--ios-blue); 
-            padding: 10px 45px 10px 15px; 
-            outline: none;
-            width: 100%;
-            -webkit-appearance: none;
-            appearance: none;
-            cursor: pointer;
+            font-size: 32px; font-weight: bold; border: 2px solid var(--ios-border); border-radius: 12px; 
+            background: #f8f8fa; color: var(--ios-blue); padding: 10px 45px 10px 15px; outline: none; width: 100%;
+            -webkit-appearance: none; appearance: none; cursor: pointer;
         }
-        .select-wrapper::after {
-            content: '▼'; font-size: 14px; color: var(--ios-blue); 
-            position: absolute; right: 18px; top: 50%; transform: translateY(-50%); pointer-events: none;
-        }
+        .select-wrapper::after { content: '▼'; font-size: 14px; color: var(--ios-blue); position: absolute; right: 18px; top: 50%; transform: translateY(-50%); pointer-events: none; }
         
         textarea { width: 90%; margin: 10px 5%; min-height: 80px; resize: none; box-sizing: border-box; font-size: 18px; border: 1px solid var(--ios-border); border-radius: 8px; padding: 8px; }
 
@@ -61,7 +48,6 @@
         .btn { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; color: var(--ios-blue); cursor: pointer; user-select: none; }
         .count-value { min-width: 45px; text-align: center; font-size: 32px; font-weight: bold; color: var(--ios-blue); }
 
-        /* 詳細設定・リクエスト項目 */
         .detail-row { padding: 12px 15px; border-bottom: 0.5px solid #eee; display: flex; flex-direction: column; gap: 8px; }
         .cat-title { font-size: 14px; font-weight: bold; color: #fff; background: var(--ios-gray); padding: 4px 10px; border-radius: 4px; display: inline-block; margin-bottom: 5px; }
         .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; padding: 5px 0; }
@@ -80,7 +66,7 @@
     <div class="total-display-card">
         <span style="font-size:14px; opacity:0.9;">レンタル料金計算 by Popolo App.com</span>
         <div class="total-amount">¥<span id="totalDisplay">0</span></div>
-        <span style="font-size:11px; text-align:right; display:block; opacity:0.7;">Version 2.1.8e</span>
+        <span style="font-size:11px; text-align:right; display:block; opacity:0.7;">Version 2.1.8f</span>
     </div>
 
     <div class="section-header">基本設定</div>
@@ -158,7 +144,7 @@
     </div>
 
     <div class="section-header">備考欄</div>
-    <div class="section"><textarea id="memo" placeholder="普段使っている道具、人より大きめ、小さめ、ご質問お遠い合わせなど"></textarea></div>
+    <div class="section"><textarea id="memo" placeholder="ご質問など"></textarea></div>
 
     <button class="submit-btn" onclick="submitToForm()">予約手続きへ進む</button>
     <div class="footer">by Popolo App.com</div>
@@ -204,18 +190,40 @@
         const planName = document.getElementById('basePrice').options[document.getElementById('basePrice').selectedIndex].text;
         let details = `【予約内容】\nプラン: ${planName}\n人数: ${data.personCount}名\n合計金額: ¥${document.getElementById('totalDisplay').innerText}\n`;
         
-        // リクエスト収集
+        if(data.exTime > 0) details += `延長: ${data.exTime}h (${data.exQty}名分)\n`;
+        details += `機材保険: ${data.ins > 0 ? 'あり' : 'なし'}\n`;
+
+        // オプション詳細の取得
+        if(data.harness > 0) {
+            details += "\n▼ハーネスサイズ:\n";
+            document.querySelectorAll('.harness-val').forEach((el, i) => details += `${i+1}人目:${el.value || '未選択'}\n`);
+        }
+        if(data.wet > 0) {
+            details += "\n▼ウェットサイズ:\n";
+            const sexes = document.querySelectorAll('.wet-sex');
+            const hs = document.querySelectorAll('.wet-h');
+            sexes.forEach((el, i) => details += `${i+1}人目:${el.value || '?'}/${hs[i].value || '?'}\n`);
+        }
+        if(data.boots > 0) {
+            details += "\n▼ブーツサイズ:\n";
+            document.querySelectorAll('.boots-val').forEach((el, i) => details += `${i+1}人目:${el.value || '未選択'}cm\n`);
+        }
+
+        // リクエスト詳細
         let req = "\n【機材リクエスト】\n";
         const wMax = document.getElementById('windBoardMax').value;
         const wMin = document.getElementById('windBoardMin').value;
         const wSail = document.getElementById('windSailMax').value;
         if(wMax || wMin || wSail) req += `ウインド: ボード大(${wMax || '-'}) 小(${wMin || '-'}) セイル(${wSail || '-'})\n`;
+        
         const wingB = document.getElementById('wingBoardSize').value;
         let wingF = [];
         document.querySelectorAll('#wingFoilGroup input:checked').forEach(el => wingF.push(el.value));
         if(wingB || wingF.length > 0) req += `ウイング: ボード(${wingB || '-'}) フォイル(${wingF.join(',') || '-'})\n`;
 
-        const encodedText = encodeURIComponent(details + req + "\n備考: " + document.getElementById('memo').value);
+        const memo = document.getElementById('memo').value;
+        const fullText = details + req + (memo ? `\n【備考】\n${memo}` : '');
+        const encodedText = encodeURIComponent(fullText);
         window.location.href = `https://docs.google.com/forms/d/e/1FAIpQLSdndrKiaXraqJiEUL27qMQOz23pbquxVdUFEOrOLKQa0Qfh2g/viewform?usp=pp_url&entry.1964882866=${encodedText}`;
     }
     calculate();
