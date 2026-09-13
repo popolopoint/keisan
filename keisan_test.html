@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>レンタル料金計算 v2.1.9 by Popolo App.com</title>
+    <title>レンタル料金計算 v2.2.0 by Popolo App.com</title>
     <style>
         :root {
             --ios-bg: #f2f2f7;
@@ -30,7 +30,7 @@
         
         .select-wrapper { position: relative; width: 100%; }
         select, .input-price { 
-            font-size: 32px; font-weight: bold; border: 2px solid var(--ios-border); border-radius: 12px; 
+            font-size: 24px; font-weight: bold; border: 2px solid var(--ios-border); border-radius: 12px; 
             background: #f8f8fa; color: var(--ios-blue); padding: 10px 45px 10px 15px; outline: none; width: 100%;
             -webkit-appearance: none; appearance: none; cursor: pointer;
         }
@@ -66,7 +66,7 @@
     <div class="total-display-card">
         <span style="font-size:14px; opacity:0.9;">レンタル料金計算 by Popolo App.com</span>
         <div class="total-amount">¥<span id="totalDisplay">0</span></div>
-        <span style="font-size:11px; text-align:right; display:block; opacity:0.7;">Version 2.1.9</span>
+        <span style="font-size:11px; text-align:right; display:block; opacity:0.7;">Version 2.2.0</span>
     </div>
 
     <div class="section-header">基本設定</div>
@@ -103,7 +103,7 @@
             </div>
             <div style="display: flex; align-items: center; gap: 4px; font-weight: bold; font-size: 16px;">
                 <input type="number" id="exTimeInput" class="input-price" min="0" value="0" style="width: 55px; font-size: 20px; padding: 6px; text-align: center;" oninput="onExInputChange('time')">
-                <span>時間(h)</span>
+                <span>(h)</span>
             </div>
             <div style="display: flex; align-items: center; gap: 4px; font-weight: bold; font-size: 16px;">
                 <input type="number" id="exQtyInput" class="input-price" min="0" value="0" style="width: 55px; font-size: 20px; padding: 6px; text-align: center;" oninput="onExInputChange('qty')">
