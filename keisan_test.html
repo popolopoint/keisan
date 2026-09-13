@@ -92,15 +92,28 @@
         </div>
     </div>
 
-    <div class="section-header">時間延長</div>
+<div class="section-header">時間延長</div>
     <div class="section">
-        <div class="row">
-            <div class="label">延長単価</div>
-            <div class="select-wrapper" style="width: auto;"><select id="exUnitPrice" onchange="calculate()" style="min-width: 150px;"><option value="1100">¥1,100</option><option value="550">¥550</option></select></div>
+        <div class="row" style="gap: 8px; justify-content: space-between; align-items: center; padding: 12px 15px;">
+            <div class="select-wrapper" style="flex: 1; max-width: 120px;">
+                <select id="exUnitPrice" onchange="calculate()" style="font-size: 18px; padding: 8px 30px 8px 10px;">
+                    <option value="1100">¥1,100</option>
+                    <option value="550">¥550</option>
+                </select>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px; font-weight: bold; font-size: 16px;">
+                <input type="number" id="exTimeInput" class="input-price" min="0" value="0" style="width: 55px; font-size: 20px; padding: 6px; text-align: center;" oninput="onExInputChange('time')">
+                <span>時間(h)</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px; font-weight: bold; font-size: 16px;">
+                <input type="number" id="exQtyInput" class="input-price" min="0" value="0" style="width: 55px; font-size: 20px; padding: 6px; text-align: center;" oninput="onExInputChange('qty')">
+                <span>人</span>
+            </div>
         </div>
-        <div class="row"><div class="label">時間(h)</div><div class="stepper"><div class="btn" onclick="step('exTime', -1)">−</div><span class="count-value" id="exTimeText">0</span><div class="btn" onclick="step('exTime', 1)">＋</div></div></div>
-        <div class="row"><div class="label">延長人数</div><div class="stepper"><div class="btn" onclick="step('exQty', -1)">−</div><span class="count-value" id="exQtyText">0</span><div class="btn" onclick="step('exQty', 1)">＋</div></div></div>
     </div>
+
+
+    
 
     <div class="section-header">オプション</div>
     <div class="section">
@@ -181,6 +194,26 @@
         calculate();
     }
 
+// 延長時間の数値入力時の連動処理関数
+function onExInputChange(type) {
+    const timeEl = document.getElementById('exTimeInput');
+    const qtyEl = document.getElementById('exQtyInput');
+    
+    let timeVal = parseInt(timeEl.value) || 0;
+    let qtyVal = parseInt(qtyEl.value) || 0;
+
+    if (type === 'time') {
+        if (timeVal > 0 && qtyVal === 0) {
+            qtyEl.value = 1;
+        } else if (timeVal === 0) {
+            qtyEl.value = 0;
+        }
+    }
+    calculate();
+}
+
+
+    
     function updateDetailFields() {
         const hDiv = document.getElementById('harnessDetails'); hDiv.innerHTML = '';
         for(let i=1; i<=data.harness; i++) hDiv.innerHTML += `<div class="detail-row"><span style="font-size:12px;color:var(--ios-blue);">ハーネス ${i}人目</span><div class="select-sub-wrapper"><select class="select-sub harness-val"><option value="">ウエスト選択</option>${(function(){let h='';for(let j=50;j<=120;j+=5)h+=`<option value="${j}">${j}〜${j+5}cm</option>`;return h;})()}</select></div></div>`;
@@ -190,11 +223,14 @@
         for(let i=1; i<=data.boots; i++) bDiv.innerHTML += `<div class="detail-row"><span style="font-size:12px;color:var(--ios-blue);">ブーツ ${i}人目</span><div class="select-sub-wrapper"><select class="select-sub boots-val"><option value="">サイズ</option>${(function(){let h='';for(let j=18;j<=30;j++)h+=`<option value="${j}">${j}cm</option>`;return h;})()}</select></div></div>`;
     }
 
-    function calculate() {
+function calculate() {
         const base = parseInt(document.getElementById('basePrice').value);
         const exUnit = parseInt(document.getElementById('exUnitPrice').value);
+        const exTime = parseInt(document.getElementById('exTimeInput').value) || 0;
+        const exQty = parseInt(document.getElementById('exQtyInput').value) || 0;
         const otherP = parseInt(document.getElementById('otherPrice').value) || 0;
-        const total = (base * data.personCount) + (exUnit * data.exTime * data.exQty) + 
+        
+        const total = (base * data.personCount) + (exUnit * exTime * exQty) + 
                       (1100 * data.ins) + (550 * data.harness) + (1100 * data.wet) + (350 * data.boots) +
                       (1100 * data.lesA) + (3300 * data.lesB) + (1100 * data.upg) + otherP;
         document.getElementById('totalDisplay').innerText = total.toLocaleString();
